@@ -56,6 +56,10 @@ var vendCmd = &cobra.Command{
 		copyCount := 0
 		for _, mod := range modules[1:] {
 			modFiles := cli.BuildModVendorList(args, mod.Dir)
+			if mod.Dir == "" {
+				output.Print("package \"%s\" is not downloaded, skip", mod.Path)
+				continue
+			}
 
 			for _, vendorFile := range modFiles {
 				x := strings.Index(vendorFile, mod.Dir)
