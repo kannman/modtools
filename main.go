@@ -56,7 +56,9 @@ var vendCmd = &cobra.Command{
 		copyCount := 0
 		for _, mod := range modules[1:] {
 			if mod.Dir == "" {
-				output.Print("package \"%s\" is not downloaded, skip", mod.Path)
+				if flagVerbose {
+					output.Debug("package \"%s\" is not downloaded, skip", mod.Path)
+				}
 				continue
 			}
 			modFiles := cli.BuildModVendorList(args, mod.Dir)
@@ -71,7 +73,7 @@ var vendCmd = &cobra.Command{
 				os.MkdirAll(filepath.Dir(localFile), os.ModePerm)
 
 				if flagVerbose {
-					output.Print("copy %s %s", vendorFile, localFile)
+					output.Debug("copy %s %s", vendorFile, localFile)
 				}
 
 				cli.CopyFile(vendorFile, localFile)

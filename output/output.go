@@ -35,6 +35,6 @@ func Info(format string, args ...interface{}) {
 }
 
 // Print prints information.
-func Print(format string, args ...interface{}) {
-	fmt.Fprintf(Stdout, format+"\n", args...)
+func Debug(format string, args ...interface{}) {
+	fmt.Fprintf(Stdout, color.BlueString(format)+"\n", args...)
 }
