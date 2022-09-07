@@ -5,6 +5,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/kannman/modtools/cli"
 	"github.com/kannman/modtools/file"
@@ -53,10 +54,19 @@ var vendCmd = &cobra.Command{
 		listJSON := cli.ReadListJSON()
 
 		modules := file.ParseDepsListJSON(listJSON)
-		copyCount := 0
+		copyCount := uint64(0)
+		warn := false
+		start := time.Now()
+
 		for _, mod := range modules[1:] {
 			if mod.Dir == "" {
-				output.Print("package \"%s\" is not downloaded, skip", mod.Path)
+				if !warn {
+					warn = true
+					output.Warn("some deps haven't downloaded packages in GOPATH; use --verbose for more details.")
+				}
+				if flagVerbose {
+					output.Debug("package \"%s\" is not downloaded, skip", mod.Path)
+				}
 				continue
 			}
 			modFiles := cli.BuildModVendorList(args, mod.Dir)
@@ -71,7 +81,7 @@ var vendCmd = &cobra.Command{
 				os.MkdirAll(filepath.Dir(localFile), os.ModePerm)
 
 				if flagVerbose {
-					output.Print("copy %s %s", vendorFile, localFile)
+					output.Debug("copy %s %s", vendorFile, localFile)
 				}
 
 				cli.CopyFile(vendorFile, localFile)
@@ -79,7 +89,7 @@ var vendCmd = &cobra.Command{
 			}
 		}
 
-		output.Info("%d files copied", copyCount)
+		output.Info("%d files copied; %s time elapsed", copyCount, time.Since(start))
 	},
 }
 
